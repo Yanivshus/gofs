@@ -1,63 +1,39 @@
 package main
 
 import (
-	"errors"
-	"fmt"
-	"io/fs"
-	"os"
-	"path/filepath"
-	"strings"
+	"github.com/gin-gonic/gin"
 )
 
-var base_dir = "/home"
+func handleChdir(c *gin.Context) {
+	var pathChange dir
 
-func getfiles() ([]string, error) {
-	root := os.DirFS(".")
+	// get json
+	if err := c.BindJSON(&pathChange); err != nil {
+		c.IndentedJSON(401, gin.H{"Error": err.Error()})
+		return
+	}
 
-	files, err := fs.Glob(root, "*")
-
+	// change current directory to given one
+	err := change_dir(pathChange.path)
 	if err != nil {
-		return nil, err
+		c.IndentedJSON(401, gin.H{"Error": err.Error()})
+		return
 	}
 
-	return files, nil
-}
-
-func change_dir(dir string) error {
-	currentPath, err := os.Getwd()
+	var wd string
+	wd, err = get_wd()
 	if err != nil {
-		return err
+		c.IndentedJSON(200, gin.H{"state": "err"})
+		return
 	}
 
-	// can only go back with ..
-	// can only go forward by specifing the dir to move to.
-	targetDir := filepath.Join(currentPath, dir)
-	cleanDir := filepath.Clean(targetDir)
-
-	// check if there is a perfix (home) for now
-	if !strings.HasPrefix(cleanDir, base_dir) {
-		err = errors.New("trying to go to forbidden directory")
-		return err
-	}
-
-	//check if directory exists
-	_, err = os.Stat(dir)
-	if err != nil {
-		return err
-	}
-
-	err = os.Chdir(dir) // change to the directory
-	if err != nil {
-		return err
-	}
-
-	return nil
-
+	c.IndentedJSON(200, gin.H{"cwd": wd})
 }
 
 func main() {
-	fmt.Println(getfiles())
-	err := change_dir("../../../../")
-	fmt.Println(err.Error())
-	fmt.Println(getfiles())
+	router := gin.Default()
+	router.POST("/chdir", handleChdir)
+
+	router.Run("localhost:6969")
+
 }
