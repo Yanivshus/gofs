@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -43,6 +44,7 @@ func change_dir(dir string) error {
 		return err
 	}
 
+	fmt.Println(cleanDir)
 	//check if directory exists
 	_, err = os.Stat(cleanDir)
 	if err != nil {

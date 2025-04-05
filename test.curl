@@ -1,0 +1,3 @@
+curl http://localhost:6969/files --include --header "Content-Type:applcation/json" --request "GET"
+
+curl http://localhost:6969/chdir  --include  --header "Content-Type:application/json"  --request "POST"  --data '{"path":".."}'
