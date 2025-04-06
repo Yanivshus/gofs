@@ -8,27 +8,25 @@ import (
 
 func handleChdir(c *gin.Context) {
 	var pathChange dir
-	fmt.Println(c.Request.Header)
 
 	// get json
 	// there is an error here
 	if err := c.BindJSON(&pathChange); err != nil {
-		c.IndentedJSON(401, gin.H{"Error": err.Error()})
+		c.IndentedJSON(500, gin.H{"Error": err.Error()})
 		return
 	}
 
-	fmt.Println(pathChange)
 	// change current directory to given one
-	err := change_dir(pathChange.path)
+	err := change_dir(pathChange.Path)
 	if err != nil {
-		c.IndentedJSON(401, gin.H{"Error": err.Error()})
+		c.IndentedJSON(500, gin.H{"Error": err.Error()})
 		return
 	}
 
 	var wd string
 	wd, err = get_wd()
 	if err != nil {
-		c.IndentedJSON(200, gin.H{"state": "err"})
+		c.IndentedJSON(500, gin.H{"state": "err"})
 		return
 	}
 

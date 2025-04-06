@@ -12,7 +12,7 @@ import (
 var base_dir = "/home"
 
 type dir struct {
-	path string
+	Path string `json:"path"`
 }
 
 func getfiles() ([]string, error) {
