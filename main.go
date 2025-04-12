@@ -15,37 +15,37 @@ func handleChdir(c *gin.Context) {
 	// get json
 	// there is an error here
 	if err := c.BindJSON(&pathChange); err != nil {
-		c.IndentedJSON(500, gin.H{"Error": err.Error()})
 		go getfiles_logger.log_str(err.Error(), c.ClientIP())
+		c.IndentedJSON(500, gin.H{"Error": err.Error()})
 		return
 	}
 
 	// change current directory to given one
 	err := change_dir(pathChange.Path)
 	if err != nil {
-		c.IndentedJSON(500, gin.H{"Error": err.Error()})
 		go getfiles_logger.log_str(err.Error(), c.ClientIP())
+		c.IndentedJSON(500, gin.H{"Error": err.Error()})
 		return
 	}
 
 	var wd string
 	wd, err = get_wd()
 	if err != nil {
-		c.IndentedJSON(500, gin.H{"state": err.Error()})
 		go getfiles_logger.log_str(err.Error(), c.ClientIP())
+		c.IndentedJSON(500, gin.H{"state": err.Error()})
 		return
 	}
 
-	c.IndentedJSON(200, gin.H{"cwd": wd})
 	go getfiles_logger.log_str("wd changed to: "+wd, c.ClientIP())
+	c.IndentedJSON(200, gin.H{"cwd": wd})
 }
 
 func handleGetFiles(c *gin.Context) {
 
 	data, err := getfiles()
 	if err != nil {
-		c.IndentedJSON(401, gin.H{"Error": err.Error()})
 		go getfiles_logger.log_str(err.Error(), c.ClientIP())
+		c.IndentedJSON(401, gin.H{"Error": err.Error()})
 		return
 	}
 
@@ -56,6 +56,8 @@ func handleGetFiles(c *gin.Context) {
 func main() {
 	chdir_logger = create_logger("CHDIR", "file.log")
 	getfiles_logger = create_logger("GET_FILES", "file.log")
+	go chdir_logger.keep_logger()
+	go getfiles_logger.keep_logger()
 
 	router := gin.Default()
 	router.POST("/chdir", handleChdir)
