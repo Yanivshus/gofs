@@ -1,0 +1,34 @@
+[2025-04-21T15:53:07+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T15:53:28+03:00][127.0.0.1][GET_FILES]-->.git,.gitignore,LICENSE,README.md,auth.go,file.log,fs,go.mod,go.sum,handleFiles.go,logs.go,main.go,test,test.curl
+[2025-04-21T16:04:51+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:05:03+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:05:08+03:00][127.0.0.1][GET_FILES]-->unexpected EOF
+[2025-04-21T16:05:22+03:00][127.0.0.1][GET_FILES]-->unexpected EOF
+[2025-04-21T16:06:11+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:06:58+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:07:09+03:00][127.0.0.1][GET_FILES]-->unexpected EOF
+[2025-04-21T16:07:20+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:09:07+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:10:41+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:11:26+03:00][127.0.0.1][GET_FILES]-->wd changed to: /home/kaish/Documents/gofs/fs/ghg
+[2025-04-21T16:11:32+03:00][127.0.0.1][GET_FILES]-->wd changed to: /home/kaish/Documents/gofs/fs
+[2025-04-21T16:11:34+03:00][127.0.0.1][GET_FILES]-->wd changed to: /home/kaish/Documents/gofs
+[2025-04-21T16:11:36+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:11:38+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:11:40+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:11:41+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:11:50+03:00][127.0.0.1][GET_FILES]-->stat /home/kaish/Documents/gofs/gofs: no such file or directory
+[2025-04-21T16:13:14+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:14:41+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:14:59+03:00][127.0.0.1][GET_FILES]-->wd changed to: /home/kaish/Documents/gofs/fs/ghg
+[2025-04-21T16:15:04+03:00][127.0.0.1][GET_FILES]-->wd changed to: /home/kaish/Documents/gofs/fs
+[2025-04-21T16:15:07+03:00][127.0.0.1][GET_FILES]-->trying to go to forbidden directory
+[2025-04-21T16:15:53+03:00][127.0.0.1][GET_FILES]-->ghg
+[2025-04-21T16:16:23+03:00][127.0.0.1][GET_FILES]-->wd changed to: /home/kaish/Documents/gofs/fs/ghg
+[2025-04-21T16:16:26+03:00][127.0.0.1][GET_FILES]-->
+[2025-04-21T17:20:37+03:00][127.0.0.1][GET_FILES]-->[{"name":"ghg","isdir":true,"fm":2147483648,"perm":0}]
+[2025-04-21T17:21:04+03:00][127.0.0.1][GET_FILES]-->wd changed to: /home/kaish/Documents/gofs/fs/ghg
+[2025-04-21T17:21:07+03:00][127.0.0.1][GET_FILES]-->[{"name":"dfdsfsd.txt","isdir":false,"fm":0,"perm":0},{"name":"fsdfsd","isdir":false,"fm":0,"perm":0}]
+[2025-04-21T17:35:09+03:00][127.0.0.1][GET_FILES]-->[{"name":"ghg","isdir":true,"fm":2147483648,"perm":0}]
+[2025-04-21T17:35:24+03:00][127.0.0.1][GET_FILES]-->wd changed to: /home/kaish/Documents/gofs/fs/ghg
+[2025-04-21T17:35:31+03:00][127.0.0.1][GET_FILES]-->[{"name":"dfdsfsd.txt","isdir":false,"fm":0,"perm":0},{"name":"fsdfsd","isdir":false,"fm":0,"perm":0}]

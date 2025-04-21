@@ -1,7 +1,8 @@
 package main
 
 import (
-	"strings"
+	"encoding/json"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,15 +50,26 @@ func handleGetFiles(c *gin.Context) {
 		return
 	}
 
-	go getfiles_logger.log_str(strings.Join(data, ","), c.ClientIP())
-	c.IndentedJSON(200, gin.H{"files": data})
+	go getfiles_logger.log_str(data, c.ClientIP())
+	c.IndentedJSON(200, gin.H{"files": json.RawMessage(data)})
 }
 
 func main() {
+
+	// start logger rutines
 	chdir_logger = create_logger("CHDIR", "file.log")
 	getfiles_logger = create_logger("GET_FILES", "file.log")
 	go chdir_logger.keep_logger()
 	go getfiles_logger.keep_logger()
+
+	err := os.Chdir("fs") // change to the directory
+	if err != nil {
+		panic(err)
+	}
+	proj_dir, err = get_wd() // need to have project folder saved.
+	if err != nil {
+		panic(err)
+	}
 
 	router := gin.Default()
 	router.POST("/chdir", handleChdir)
