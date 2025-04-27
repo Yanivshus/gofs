@@ -56,7 +56,7 @@ func create_logger(name string, fname string) *logger {
 		file:   f,
 		tag:    name,
 		fname:  absP,
-		ticker: time.NewTicker(5 * time.Second),
+		ticker: time.NewTicker(10 * time.Minute),
 	}
 
 }

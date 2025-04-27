@@ -55,7 +55,6 @@ func handleGetFiles(c *gin.Context) {
 }
 
 func main() {
-
 	// start logger rutines
 	chdir_logger = create_logger("CHDIR", "file.log")
 	getfiles_logger = create_logger("GET_FILES", "file.log")
