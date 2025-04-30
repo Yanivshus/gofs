@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type logger struct {
+type Logger struct {
 	tag    string
 	file   *os.File
 	fname  string
@@ -17,7 +17,7 @@ type logger struct {
 	mu     sync.Mutex
 }
 
-func (l *logger) keep_logger() {
+func (l *Logger) Keep_logger() {
 	for {
 		select {
 		case <-l.ticker.C:
@@ -44,7 +44,7 @@ func (l *logger) keep_logger() {
 	}
 }
 
-func create_logger(name string, fname string) *logger {
+func Create_logger(name string, fname string) *Logger {
 	f, err := os.OpenFile(fname, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		panic(err)
@@ -52,7 +52,7 @@ func create_logger(name string, fname string) *logger {
 
 	absP, _ := filepath.Abs(fname)
 
-	return &logger{
+	return &Logger{
 		file:   f,
 		tag:    name,
 		fname:  absP,
@@ -61,7 +61,7 @@ func create_logger(name string, fname string) *logger {
 
 }
 
-func (l *logger) log_str(data string, ip string) error {
+func (l *Logger) Log_str(data string, ip string) error {
 	// logging importent details like the ip of the user, tag and request time
 	var builder strings.Builder
 	builder.WriteString("[")
@@ -99,7 +99,7 @@ func (l *logger) log_str(data string, ip string) error {
 	return nil
 }
 
-func (l *logger) destroy_log() error {
+func (l *Logger) Destroy_log() error {
 	l.mu.Lock()
 	defer l.mu.Unlock() // wait until end of function to unloock mutex
 

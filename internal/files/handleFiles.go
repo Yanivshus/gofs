@@ -41,28 +41,28 @@ const (
 	OS_ALL_RWX = OS_ALL_RW | OS_GROUP_X
 )
 
-var proj_dir string
+var Proj_dir string
 
-type dir struct {
+type Dir struct {
 	Path string `json:"path"`
 }
 
-type file_t struct {
+type File_t struct {
 	Name  string `json:"name"`
 	IsDir bool   `json:"isdir"`
 	Type  uint32 `json:"fm"`
 	Perm  uint32 `json:"perm"`
 }
 
-func getfiles() (string, error) {
-	var dir []file_t
+func Getfiles() (string, error) {
+	var dir []File_t
 
 	c, err := os.ReadDir(".")
 	if err != nil {
 		return "", err
 	}
 	for _, entry := range c {
-		dir = append(dir, file_t{
+		dir = append(dir, File_t{
 			entry.Name(),
 			entry.IsDir(),
 			uint32(entry.Type().Type()),
@@ -74,30 +74,30 @@ func getfiles() (string, error) {
 	return string(json_bbl), nil
 }
 
-func change_dir(dir string) error {
+func Change_Dir(Dir string) error {
 	currentPath, err := os.Getwd()
 	if err != nil {
 		return err
 	}
 
 	// can only go back with ..
-	// can only go forward by specifing the dir to move to.
-	targetDir := filepath.Join(currentPath, dir)
+	// can only go forward by specifing the Dir to move to.
+	targetDir := filepath.Join(currentPath, Dir)
 	cleanDir := filepath.Clean(targetDir)
 
 	// check if there is a perfix (home) for now
-	if !strings.HasPrefix(cleanDir, proj_dir) {
-		err = errors.New("trying to go to forbidden directory")
+	if !strings.HasPrefix(cleanDir, Proj_dir) {
+		err = errors.New("trying to go to forbidden Directory")
 		return err
 	}
 
-	//check if directory exists
+	//check if Directory exists
 	_, err = os.Stat(cleanDir)
 	if err != nil {
 		return err
 	}
 
-	err = os.Chdir(cleanDir) // change to the directory
+	err = os.Chdir(cleanDir) // change to the Directory
 	if err != nil {
 		return err
 	}
@@ -106,7 +106,7 @@ func change_dir(dir string) error {
 
 }
 
-func get_wd() (string, error) {
+func Get_wd() (string, error) {
 	data, err := os.Getwd()
 	if err != nil {
 		return "", err

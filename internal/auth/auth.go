@@ -17,7 +17,7 @@ type data_instance struct {
 	db *sqlx.DB
 }
 
-func connect_redis() , error {
+func connect_redis() error {
 	pass := os.Getenv("REDISPASS")
 	if pass == "" {
 		return errors.New("missing redis password")
