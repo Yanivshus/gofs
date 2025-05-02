@@ -5,19 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
 )
 
-type data_instance struct {
-	cache redis.Options
-	db *sqlx.DB
-}
-
-func connect_redis() error {
+func ConnectRedis() error {
 	pass := os.Getenv("REDISPASS")
 	if pass == "" {
 		return errors.New("missing redis password")
@@ -37,22 +30,4 @@ func connect_redis() error {
 
 	fmt.Println(pong)
 	return nil
-}
-
-func connect_postgres() *sqlx.DB {
-	var sb strings.Builder
-
-	pass := os.Getenv("GOFSDBPASS")
-
-	sb.WriteString("postgres://postgres:")
-	sb.WriteString(pass)
-	sb.WriteString("@localhost:5432/gofs-db?sslmode=disable")
-
-	db, err := sqlx.Connect("postgres", sb.String())
-	if err != nil {
-		panic(err)
-	}
-
-	return db
-	
 }

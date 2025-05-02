@@ -44,8 +44,46 @@ func (l *Logger) Keep_logger() {
 	}
 }
 
+const (
+	LogDir = "logs"
+)
+
+var state bool = false
+
+func CreateDirIfNeeded(DirName string) error {
+	fi, err := os.Stat(LogDir)
+	if err != nil { // if the folder doesnt exists we will create one
+		err = os.Mkdir(LogDir, 0755)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	if !fi.IsDir() { // if found file but isnt a folder we will create one.
+		err = os.Mkdir(LogDir, 0755)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return nil
+}
+
 func Create_logger(name string, fname string) *Logger {
-	f, err := os.OpenFile(fname, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if !state {
+		CreateDirIfNeeded(LogDir)
+		state = true
+		fmt.Println("beenHere")
+	}
+
+	var sb strings.Builder
+	sb.WriteString(LogDir)
+	sb.WriteString("/")
+	sb.WriteString(fname)
+
+	f, err := os.OpenFile(sb.String(), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		panic(err)
 	}
@@ -90,6 +128,7 @@ func (l *Logger) Log_str(data string, ip string) error {
 		fmt.Println(err.Error())
 		return err
 	}
+
 	if n != len(cdata) { // if written bytes are not the amount that was need to be written then error is return.
 		err = fmt.Errorf("problem writing %d bytes to log file, only %d bytes were written", n, len(cdata))
 		fmt.Println(err.Error())
