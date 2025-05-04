@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fs/gofs_file_server/internal/database"
+	"fmt"
+	"fs/gofs_file_server/internal/crypto"
 )
 
 func main() {
@@ -23,6 +24,10 @@ func main() {
 	router.Run("localhost:6969")
 	web.Dtor_web()*/
 
-	db := database.ConnectPostgres()
-	db.Lg.Log_str("hiiiiii", "gfgfg")
+	/*db := database.ConnectPostgres()
+	db.ClosePostgres()*/
+
+	str, _ := crypto.GenSalt()
+	fmt.Println(str)
+
 }

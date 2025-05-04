@@ -72,10 +72,9 @@ func CreateDirIfNeeded(DirName string) error {
 }
 
 func Create_logger(name string, fname string) *Logger {
-	if !state {
+	if !state { // optimization to not check if dir exists every time.
 		CreateDirIfNeeded(LogDir)
 		state = true
-		fmt.Println("beenHere")
 	}
 
 	var sb strings.Builder
@@ -138,7 +137,10 @@ func (l *Logger) Log_str(data string, ip string) error {
 	return nil
 }
 
-func (l *Logger) Destroy_log() error {
+
+//func (l *Logger) Log
+
+func (l *Logger) DestroyLog() error {
 	l.mu.Lock()
 	defer l.mu.Unlock() // wait until end of function to unloock mutex
 

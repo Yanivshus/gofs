@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"fs/gofs_file_server/internal/files"
 	"os"
@@ -11,8 +12,13 @@ import (
 )
 
 type DbInstance struct {
-	Db     *sqlx.DB
+	Db *sqlx.DB
 	Lg *files.Logger
+}
+
+type User struct {
+	Username string `json:"username"`
+	Password string `json:"username"`
 }
 
 const (
@@ -21,6 +27,10 @@ const (
 	user   = "postgres"
 	dbname = "backend"
 )
+
+const tables = `
+CREATE TABLE IF NOT EXISTS Users (ID SERIAL PRIMARY KEY, Username TEXT NOT NULL, Password TEXT NOT NULL);
+`
 
 func ConnectPostgres() DbInstance {
 	err := godotenv.Load(".env")
@@ -48,8 +58,45 @@ func ConnectPostgres() DbInstance {
 	lg := files.Create_logger("DB", "db.log")
 	go lg.Keep_logger()
 
+	db.MustExec(tables)
+
+	_, err = db.Begin()
+	if err != nil {
+		panic(err)
+	}
+
+	var stmt *sql.Stmt
+	stmt, err = db.Prepare("INSERT INTO Users (username, password) VALUES($1, $2);")
+	if err != nil {
+		fmt.Println("hre1")
+		panic(err)
+	}
+	_, err = stmt.Exec("Yaniv", "Yaniv123")
+	if err != nil {
+		fmt.Println("hre2")
+		panic(err)
+	}
+
+	stmt.Close()
 	return DbInstance{
 		db,
 		lg,
 	}
 }
+
+// function to close  the db connection.
+func (db *DbInstance) ClosePostgres() error {
+	err := db.Db.Close() // close the db
+	if err != nil {
+		return err
+	}
+	err = db.Lg.DestroyLog() // close the logger
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/*func (db *DbInstance) CheckCredentials(usr User) error {
+
+}*/

@@ -19,8 +19,8 @@ func Init_web() {
 }
 
 func Dtor_web() {
-	chdir_logger.Destroy_log()
-	getfiles_logger.Destroy_log()
+	chdir_logger.DestroyLog()
+	getfiles_logger.DestroyLog()
 }
 
 func HandleChdir(c *gin.Context) {
@@ -65,4 +65,8 @@ func HandleGetFiles(c *gin.Context) {
 
 	go getfiles_logger.Log_str(data, c.ClientIP())
 	c.IndentedJSON(200, gin.H{"files": json.RawMessage(data)})
+}
+
+func HandleLogin(c *gin.Context) {
+	
 }
