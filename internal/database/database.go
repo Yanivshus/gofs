@@ -1,7 +1,6 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
 	"fs/gofs_file_server/internal/files"
 	"os"
@@ -29,7 +28,11 @@ const (
 )
 
 const tables = `
-CREATE TABLE IF NOT EXISTS Users (ID SERIAL PRIMARY KEY, Username TEXT NOT NULL, Password TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS Users 
+(ID SERIAL PRIMARY KEY,
+Username TEXT NOT NULL,
+Password TEXT NOT NULL,
+Salt TEXT NOT NULL);
 `
 
 func ConnectPostgres() DbInstance {
@@ -60,7 +63,7 @@ func ConnectPostgres() DbInstance {
 
 	db.MustExec(tables)
 
-	_, err = db.Begin()
+	/*_, err = db.Begin()
 	if err != nil {
 		panic(err)
 	}
@@ -77,7 +80,7 @@ func ConnectPostgres() DbInstance {
 		panic(err)
 	}
 
-	stmt.Close()
+	stmt.Close()*/
 	return DbInstance{
 		db,
 		lg,
