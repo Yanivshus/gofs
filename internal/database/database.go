@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -36,7 +35,7 @@ const tables = `
 CREATE TABLE IF NOT EXISTS Users 
 (ID SERIAL PRIMARY KEY,
 Username TEXT NOT NULL,
-Password TEXT NOT NULL,
+Password BYTEA NOT NULL,
 Email TEXT NOT NULL,
 Salt TEXT NOT NULL);
 
@@ -44,7 +43,7 @@ Salt TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS Pending 
 (ID SERIAL PRIMARY KEY,
 Username TEXT NOT NULL,
-Password TEXT NOT NULL,
+Password BYTEA NOT NULL,
 Email TEXT NOT NULL,
 Salt TEXT NOT NULL);
 `
@@ -56,6 +55,7 @@ func InitDb() {
 }
 
 func GetInstanceDb() DbInstance {
+	fmt.Println("fdf")
 	if !gdb.ex {
 		gdb.Db, gdb.Lg = connectPostgres()
 		gdb.ex = true
@@ -65,10 +65,10 @@ func GetInstanceDb() DbInstance {
 }
 
 func connectPostgres() (*sqlx.DB, *files.Logger) {
-	err := godotenv.Load(".env")
+	/*err := godotenv.Load(".env")
 	if err != nil {
-		panic("couldn't load connection details")
-	}
+		panic(err)
+	}*/
 
 	password := os.Getenv("DB_PASS")
 
@@ -132,38 +132,44 @@ func (db *DbInstance) DoesUserExists(usr User) error {
 	for rows.Next() {
 		count += 1
 		if count >= 1 {
-			return nil
+			return errors.New("the user exists")
 		}
 	}
 
-	return errors.New("the user doesn't exists")
+	return nil
 }
 
 func (db *DbInstance) AddUserToPending(usr User) error {
 	tx, err := db.Db.Begin()
 	if err != nil {
+		fmt.Println("here1")
 		return err
 	}
 	defer tx.Commit() // commit the transaction at end of life of tx.
 
 	var sb strings.Builder
-	sb.WriteString("INSERT INTO Pending (Username, Email, Password, Salt) VALUES ($1,$2,$3,$4)")
+	sb.WriteString("INSERT INTO Pending (Username, Password, Email, Salt) VALUES ($1,$2,$3,$4)")
 	stmt, err := tx.Prepare(sb.String())
 	if err != nil {
+		fmt.Println("here2")
 		return err
 	}
 
 	salt, err := crypto.GenSalt()
 	if err != nil {
+		fmt.Println("here3")
 		return err
 	}
 
 	res, err := stmt.Exec(usr.Username, crypto.HashArgon(usr.Password, salt), usr.Email, salt)
 	if err != nil {
+		fmt.Println("here4")
+		fmt.Println(err.Error())
 		return err
 	}
 
 	if n, _ := res.RowsAffected(); n == 0 {
+		fmt.Println("here5")
 		return errors.New("problem inserting pending user")
 	}
 

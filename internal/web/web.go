@@ -76,7 +76,7 @@ func HandleLogin(c *gin.Context) {
 func HandleSignUp(c *gin.Context) {
 	var user database.User
 	if err := c.BindJSON(&user); err != nil {
-		c.IndentedJSON(500, gin.H{"error": "internal error"})
+		c.IndentedJSON(500, gin.H{"error": "internal error1"})
 		return
 	}
 

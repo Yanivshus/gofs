@@ -137,7 +137,6 @@ func (l *Logger) Log_str(data string, ip string) error {
 	return nil
 }
 
-
 //func (l *Logger) Log
 
 func (l *Logger) DestroyLog() error {
