@@ -7,4 +7,4 @@ services:
             -pgdata:/var/lib/postgresql/data
         environment:
             - POSTGRES_USER=postgres
-            - PO
+            - POfg
