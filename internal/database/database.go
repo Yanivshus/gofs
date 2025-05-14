@@ -108,14 +108,16 @@ func (db *DbInstance) ClosePostgres() error {
 	return nil
 }
 
-func (db *DbInstance) DoesUserExists(usr User) (bool, error) {
+func (db *DbInstance) DoesUserExists(usr User, where string) (bool, error) {
 	tx, err := db.Db.Begin()
 	if err != nil {
 		return false, err
 	}
 
 	var sb strings.Builder
-	sb.WriteString("SELECT EXISTS(SELECT 1 FROM pending WHERE username=$1);")
+	sb.WriteString("SELECT EXISTS(SELECT 1 FROM ")
+	sb.WriteString(where)
+	sb.WriteString(" WHERE username=$1);")
 
 	stmt, err := tx.Prepare(sb.String())
 	if err != nil {
@@ -174,4 +176,8 @@ func (db *DbInstance) AddUserToPending(usr User) error {
 	db.Lg.LogDb(log.String())
 
 	return nil
+}
+
+func (db *DbInstance) LoginUser(usr User) error {
+
 }

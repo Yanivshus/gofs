@@ -81,7 +81,7 @@ func HandleSignUp(c *gin.Context) {
 	}
 
 	db := database.GetInstanceDb()
-	if res, err := db.DoesUserExists(user); err != nil || res {
+	if res, err := db.DoesUserExists(user, "pending"); err != nil || res {
 		c.IndentedJSON(500, gin.H{"error": "user already exists"})
 		return
 	}
