@@ -5,8 +5,6 @@ import (
 	"fs/gofs_file_server/internal/database"
 	"fs/gofs_file_server/internal/files"
 
-	"fs/gofs_file_server/internal/crypto"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -74,6 +72,7 @@ func HandleLogin(c *gin.Context) {
 
 }
 
+// TODO : dont allow to see api gateway responses.
 func HandleSignUp(c *gin.Context) {
 	var user database.User
 	if err := c.BindJSON(&user); err != nil {
@@ -87,11 +86,10 @@ func HandleSignUp(c *gin.Context) {
 		return
 	}
 
-	salt, err := crypto.GenSalt()
+	err := db.AddUserToPending(user)
 	if err != nil {
-		c.IndentedJSON(500, gin.H{"error": "internal error"})
+		c.IndentedJSON(500, gin.H{"error": "problem inserting user to pending"})
 		return
 	}
-	
-	
+
 }

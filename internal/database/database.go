@@ -3,6 +3,7 @@ package database
 import (
 	"errors"
 	"fmt"
+	"fs/gofs_file_server/internal/crypto"
 	"fs/gofs_file_server/internal/files"
 	"os"
 	"strings"
@@ -39,6 +40,13 @@ Password TEXT NOT NULL,
 Email TEXT NOT NULL,
 Salt TEXT NOT NULL);
 
+
+CREATE TABLE IF NOT EXISTS Pending 
+(ID SERIAL PRIMARY KEY,
+Username TEXT NOT NULL,
+Password TEXT NOT NULL,
+Email TEXT NOT NULL,
+Salt TEXT NOT NULL);
 `
 
 var gdb DbInstance
@@ -84,24 +92,6 @@ func connectPostgres() (*sqlx.DB, *files.Logger) {
 
 	db.MustExec(tables)
 
-	/*_, err = db.Begin()
-	if err != nil {
-		panic(err)
-	}
-
-	var stmt *sql.Stmt
-	stmt, err = db.Prepare("INSERT INTO Users (username, password) VALUES($1, $2);")
-	if err != nil {
-		fmt.Println("hre1")
-		panic(err)
-	}
-	_, err = stmt.Exec("Yaniv", "Yaniv123")
-	if err != nil {
-		fmt.Println("hre2")
-		panic(err)
-	}
-
-	stmt.Close()*/
 	return db, lg
 }
 
@@ -125,18 +115,18 @@ func (db *DbInstance) DoesUserExists(usr User) error {
 	}
 
 	var sb strings.Builder
-	sb.WriteString("SELECT 1 FROM users WHERE EXISTS Username=$1")
-	sb.WriteString(usr.Username)
+	sb.WriteString("SELECT 1 FROM Pending WHERE EXISTS Username=$1")
 	stmt, err := tx.Prepare(sb.String())
 	if err != nil {
 		return err
 	}
 
-	rows, err := stmt.Query()
+	rows, err := stmt.Query(usr.Username)
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
+	defer tx.Commit()
 
 	var count int32
 	for rows.Next() {
@@ -147,6 +137,37 @@ func (db *DbInstance) DoesUserExists(usr User) error {
 	}
 
 	return errors.New("the user doesn't exists")
+}
+
+func (db *DbInstance) AddUserToPending(usr User) error {
+	tx, err := db.Db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Commit() // commit the transaction at end of life of tx.
+
+	var sb strings.Builder
+	sb.WriteString("INSERT INTO Pending (Username, Email, Password, Salt) VALUES ($1,$2,$3,$4)")
+	stmt, err := tx.Prepare(sb.String())
+	if err != nil {
+		return err
+	}
+
+	salt, err := crypto.GenSalt()
+	if err != nil {
+		return err
+	}
+
+	res, err := stmt.Exec(usr.Username, crypto.HashArgon(usr.Password, salt), usr.Email, salt)
+	if err != nil {
+		return err
+	}
+
+	if n, _ := res.RowsAffected(); n == 0 {
+		return errors.New("problem inserting pending user")
+	}
+
+	return nil
 }
 
 /*func (db *DbInstance) CheckCredentials(usr User) error {
