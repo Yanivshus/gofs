@@ -87,8 +87,8 @@ func connectPostgres() (*sqlx.DB, *files.Logger) {
 
 	fmt.Println("DB Connection started successfully")
 
-	lg := files.Create_logger("DB", "db.log")
-	go lg.Keep_logger()
+	lg := files.CreateLogger("DB", "db.log")
+	go lg.KeepLogger()
 
 	db.MustExec(tables)
 

@@ -17,7 +17,7 @@ type Logger struct {
 	mu     sync.Mutex
 }
 
-func (l *Logger) Keep_logger() {
+func (l *Logger) KeepLogger() {
 	for {
 		select {
 		case <-l.ticker.C:
@@ -71,7 +71,7 @@ func CreateDirIfNeeded(DirName string) error {
 	return nil
 }
 
-func Create_logger(name string, fname string) *Logger {
+func CreateLogger(name string, fname string) *Logger {
 	if !state { // optimization to not check if dir exists every time.
 		CreateDirIfNeeded(LogDir)
 		state = true

@@ -13,10 +13,10 @@ var getfiles_logger *files.Logger
 
 func Init_web() {
 	// start logger rutines
-	chdir_logger = files.Create_logger("CHDIR", "file.log")
-	getfiles_logger = files.Create_logger("GET_FILES", "file.log")
-	go chdir_logger.Keep_logger()
-	go getfiles_logger.Keep_logger()
+	chdir_logger = files.CreateLogger("CHDIR", "file.log")
+	getfiles_logger = files.CreateLogger("GET_FILES", "file.log")
+	go chdir_logger.KeepLogger()
+	go getfiles_logger.KeepLogger()
 }
 
 func Dtor_web() {
