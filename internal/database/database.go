@@ -108,41 +108,41 @@ func (db *DbInstance) ClosePostgres() error {
 	return nil
 }
 
-func (db *DbInstance) DoesUserExists(usr User) error {
+func (db *DbInstance) DoesUserExists(usr User) (bool, error) {
 	tx, err := db.Db.Begin()
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	var sb strings.Builder
-	sb.WriteString("SELECT 1 FROM Pending WHERE EXISTS Username=$1")
+	sb.WriteString("SELECT EXISTS(SELECT 1 FROM pending WHERE username=$1);")
+
 	stmt, err := tx.Prepare(sb.String())
 	if err != nil {
-		return err
+		return false, err
 	}
+	defer tx.Commit()
 
 	rows, err := stmt.Query(usr.Username)
 	if err != nil {
-		return err
+		return false, err
 	}
 	defer rows.Close()
-	defer tx.Commit()
 
-	var count int32
 	for rows.Next() {
-		count += 1
-		if count >= 1 {
-			return errors.New("the user exists")
+		var res bool
+		if err := rows.Scan(&res); err != nil {
+			return true, err
 		}
+		return res, nil
 	}
 
-	return nil
+	return true, nil
 }
 
 func (db *DbInstance) AddUserToPending(usr User) error {
 	tx, err := db.Db.Begin()
 	if err != nil {
-		fmt.Println("here1")
 		return err
 	}
 	defer tx.Commit() // commit the transaction at end of life of tx.
@@ -151,31 +151,27 @@ func (db *DbInstance) AddUserToPending(usr User) error {
 	sb.WriteString("INSERT INTO Pending (Username, Password, Email, Salt) VALUES ($1,$2,$3,$4)")
 	stmt, err := tx.Prepare(sb.String())
 	if err != nil {
-		fmt.Println("here2")
 		return err
 	}
 
 	salt, err := crypto.GenSalt()
 	if err != nil {
-		fmt.Println("here3")
 		return err
 	}
 
 	res, err := stmt.Exec(usr.Username, crypto.HashArgon(usr.Password, salt), usr.Email, salt)
 	if err != nil {
-		fmt.Println("here4")
-		fmt.Println(err.Error())
 		return err
 	}
 
 	if n, _ := res.RowsAffected(); n == 0 {
-		fmt.Println("here5")
 		return errors.New("problem inserting pending user")
 	}
 
+	var log strings.Builder
+	log.WriteString("Added user to pending, username: ")
+	log.WriteString(usr.Username)
+	db.Lg.LogDb(log.String())
+
 	return nil
 }
-
-/*func (db *DbInstance) CheckCredentials(usr User) error {
-
-}*/

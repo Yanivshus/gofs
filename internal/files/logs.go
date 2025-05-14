@@ -98,7 +98,7 @@ func Create_logger(name string, fname string) *Logger {
 
 }
 
-func (l *Logger) Log_str(data string, ip string) error {
+func (l *Logger) LogStr(data string, ip string) error {
 	// logging importent details like the ip of the user, tag and request time
 	var builder strings.Builder
 	builder.WriteString("[")
@@ -137,7 +137,41 @@ func (l *Logger) Log_str(data string, ip string) error {
 	return nil
 }
 
-//func (l *Logger) Log
+func (l *Logger) LogDb(data string) error {
+	// logging importent details like the ip of the user, tag and request time
+	var builder strings.Builder
+	builder.WriteString("[")
+	builder.WriteString(time.Now().Format(time.RFC3339))
+	builder.WriteString("]")
+
+	if l.tag != "" {
+		builder.WriteString("[")
+		builder.WriteString(l.tag)
+		builder.WriteString("]")
+	}
+
+	builder.WriteString("-->")
+	builder.WriteString(data)
+	builder.WriteString("\n")
+	cdata := builder.String()
+
+	l.mu.Lock()
+	defer l.mu.Unlock() // wait until end of function to unloock mutex
+
+	n, err := l.file.Write([]byte(cdata)) // write logging msg.
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+
+	if n != len(cdata) { // if written bytes are not the amount that was need to be written then error is return.
+		err = fmt.Errorf("problem writing %d bytes to log file, only %d bytes were written", n, len(cdata))
+		fmt.Println(err.Error())
+		return err
+	}
+
+	return nil
+}
 
 func (l *Logger) DestroyLog() error {
 	l.mu.Lock()

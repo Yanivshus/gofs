@@ -30,7 +30,7 @@ func HandleChdir(c *gin.Context) {
 	// get json
 	// there is an error here
 	if err := c.BindJSON(&pathChange); err != nil {
-		go getfiles_logger.Log_str(err.Error(), c.ClientIP())
+		go getfiles_logger.LogStr(err.Error(), c.ClientIP())
 		c.IndentedJSON(500, gin.H{"Error": err.Error()})
 		return
 	}
@@ -38,7 +38,7 @@ func HandleChdir(c *gin.Context) {
 	// change current directory to given one
 	err := files.Change_Dir(pathChange.Path)
 	if err != nil {
-		go getfiles_logger.Log_str(err.Error(), c.ClientIP())
+		go getfiles_logger.LogStr(err.Error(), c.ClientIP())
 		c.IndentedJSON(500, gin.H{"Error": err.Error()})
 		return
 	}
@@ -46,12 +46,12 @@ func HandleChdir(c *gin.Context) {
 	var wd string
 	wd, err = files.Get_wd()
 	if err != nil {
-		go getfiles_logger.Log_str(err.Error(), c.ClientIP())
+		go getfiles_logger.LogStr(err.Error(), c.ClientIP())
 		c.IndentedJSON(500, gin.H{"state": err.Error()})
 		return
 	}
 
-	go getfiles_logger.Log_str("wd changed to: "+wd, c.ClientIP())
+	go getfiles_logger.LogStr("wd changed to: "+wd, c.ClientIP())
 	c.IndentedJSON(200, gin.H{"cwd": wd})
 }
 
@@ -59,12 +59,12 @@ func HandleGetFiles(c *gin.Context) {
 
 	data, err := files.Getfiles()
 	if err != nil {
-		go getfiles_logger.Log_str(err.Error(), c.ClientIP())
+		go getfiles_logger.LogStr(err.Error(), c.ClientIP())
 		c.IndentedJSON(401, gin.H{"Error": err.Error()})
 		return
 	}
 
-	go getfiles_logger.Log_str(data, c.ClientIP())
+	go getfiles_logger.LogStr(data, c.ClientIP())
 	c.IndentedJSON(200, gin.H{"files": json.RawMessage(data)})
 }
 
@@ -81,7 +81,7 @@ func HandleSignUp(c *gin.Context) {
 	}
 
 	db := database.GetInstanceDb()
-	if err := db.DoesUserExists(user); err != nil {
+	if res, err := db.DoesUserExists(user); err != nil || res {
 		c.IndentedJSON(500, gin.H{"error": "user already exists"})
 		return
 	}
