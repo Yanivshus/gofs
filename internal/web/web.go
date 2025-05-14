@@ -2,7 +2,10 @@ package web
 
 import (
 	"encoding/json"
+	"fs/gofs_file_server/internal/database"
 	"fs/gofs_file_server/internal/files"
+
+	"fs/gofs_file_server/internal/crypto"
 
 	"github.com/gin-gonic/gin"
 )
@@ -68,5 +71,27 @@ func HandleGetFiles(c *gin.Context) {
 }
 
 func HandleLogin(c *gin.Context) {
+
+}
+
+func HandleSignUp(c *gin.Context) {
+	var user database.User
+	if err := c.BindJSON(&user); err != nil {
+		c.IndentedJSON(500, gin.H{"error": "internal error"})
+		return
+	}
+
+	db := database.GetInstanceDb()
+	if err := db.DoesUserExists(user); err != nil {
+		c.IndentedJSON(500, gin.H{"error": "user already exists"})
+		return
+	}
+
+	salt, err := crypto.GenSalt()
+	if err != nil {
+		c.IndentedJSON(500, gin.H{"error": "internal error"})
+		return
+	}
+	
 	
 }

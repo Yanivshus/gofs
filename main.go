@@ -25,7 +25,7 @@ func main() {
 	router.Run("localhost:6969")
 	web.Dtor_web()*/
 
-	db := database.ConnectPostgres()
+	db := database.GetInstanceDb()
 	db.ClosePostgres()
 
 	str, _ := crypto.GenSalt()

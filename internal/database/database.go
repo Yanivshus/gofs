@@ -1,9 +1,11 @@
 package database
 
 import (
+	"errors"
 	"fmt"
 	"fs/gofs_file_server/internal/files"
 	"os"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
@@ -13,11 +15,13 @@ import (
 type DbInstance struct {
 	Db *sqlx.DB
 	Lg *files.Logger
+	ex bool
 }
 
 type User struct {
 	Username string `json:"username"`
-	Password string `json:"username"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
 }
 
 const (
@@ -32,10 +36,27 @@ CREATE TABLE IF NOT EXISTS Users
 (ID SERIAL PRIMARY KEY,
 Username TEXT NOT NULL,
 Password TEXT NOT NULL,
+Email TEXT NOT NULL,
 Salt TEXT NOT NULL);
+
 `
 
-func ConnectPostgres() DbInstance {
+var gdb DbInstance
+
+func InitDb() {
+	gdb.ex = false
+}
+
+func GetInstanceDb() DbInstance {
+	if !gdb.ex {
+		gdb.Db, gdb.Lg = connectPostgres()
+		gdb.ex = true
+		return gdb
+	}
+	return gdb
+}
+
+func connectPostgres() (*sqlx.DB, *files.Logger) {
 	err := godotenv.Load(".env")
 	if err != nil {
 		panic("couldn't load connection details")
@@ -81,10 +102,7 @@ func ConnectPostgres() DbInstance {
 	}
 
 	stmt.Close()*/
-	return DbInstance{
-		db,
-		lg,
-	}
+	return db, lg
 }
 
 // function to close  the db connection.
@@ -98,6 +116,37 @@ func (db *DbInstance) ClosePostgres() error {
 		return err
 	}
 	return nil
+}
+
+func (db *DbInstance) DoesUserExists(usr User) error {
+	tx, err := db.Db.Begin()
+	if err != nil {
+		return err
+	}
+
+	var sb strings.Builder
+	sb.WriteString("SELECT 1 FROM users WHERE EXISTS Username=$1")
+	sb.WriteString(usr.Username)
+	stmt, err := tx.Prepare(sb.String())
+	if err != nil {
+		return err
+	}
+
+	rows, err := stmt.Query()
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	var count int32
+	for rows.Next() {
+		count += 1
+		if count >= 1 {
+			return nil
+		}
+	}
+
+	return errors.New("the user doesn't exists")
 }
 
 /*func (db *DbInstance) CheckCredentials(usr User) error {
