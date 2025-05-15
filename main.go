@@ -29,5 +29,4 @@ func main() {
 	router.POST("/signup", web.HandleSignUp)
 	router.Run("localhost:6969")
 	web.Dtor_web()
-
 }

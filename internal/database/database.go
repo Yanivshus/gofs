@@ -1,6 +1,7 @@
 package database
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"fs/gofs_file_server/internal/crypto"
@@ -22,6 +23,15 @@ type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
+}
+
+// user for internal use (including all attributes that doesn't get passed in the json)
+type IUser struct {
+	Id       uint64
+	Username string
+	Password []byte
+	Email    string
+	Salt     string
 }
 
 const (
@@ -55,7 +65,6 @@ func InitDb() {
 }
 
 func GetInstanceDb() DbInstance {
-	fmt.Println("fdf")
 	if !gdb.ex {
 		gdb.Db, gdb.Lg = connectPostgres()
 		gdb.ex = true
@@ -142,6 +151,35 @@ func (db *DbInstance) DoesUserExists(usr User, where string) (bool, error) {
 	return true, nil
 }
 
+func (db *DbInstance) GetUserData(username string) (*IUser, error) {
+	tx, err := db.Db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Commit()
+
+	stmt, err := tx.Prepare("SELECT * FROM users WHERE username=$1;")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(username)
+	if err != nil {
+		return nil, err
+	}
+
+	var usr IUser
+
+	for rows.Next() {
+		if err := rows.Scan(&usr.Id, &usr.Username, &usr.Password, &usr.Email, &usr.Salt); err != nil {
+			return nil, err
+		}
+	}
+
+	return &usr, nil
+}
+
 func (db *DbInstance) AddUserToPending(usr User) error {
 	tx, err := db.Db.Begin()
 	if err != nil {
@@ -178,6 +216,15 @@ func (db *DbInstance) AddUserToPending(usr User) error {
 	return nil
 }
 
-func (db *DbInstance) LoginUser(usr User) error {
+func (db *DbInstance) LoginUser(usr User) (bool, error) {
+	user, err := db.GetUserData(usr.Username)
+	if err != nil {
+		return false, errors.New("user doesn't exists")
+	}
 
+	if bytes.Equal(user.Password, crypto.HashArgon(usr.Password, user.Salt)) {
+		return true, nil
+	}
+
+	return false, nil
 }
