@@ -13,7 +13,7 @@ import (
 func main() {
 	web.Init_web()
 	database.LoadEnv() // load env veriables ment for db
-	database.InitDb() // init instance
+	database.InitDb()  // init instance
 	database.GetInstanceDb()
 
 	err := os.Chdir("fs") // change to the directory
@@ -29,6 +29,7 @@ func main() {
 	router.POST("/chdir", web.HandleChdir)
 	router.GET("/files", web.HandleGetFiles)
 	router.POST("/signup", web.HandleSignUp)
+	router.POST("/upload", web.HandleUpload)
 	router.Run("localhost:6969")
 	web.Dtor_web()
 }

@@ -4,3 +4,8 @@ curl http://localhost:6969/chdir  --include  --header "Content-Type:application/
 
 
 curl http://localhost:6969/signup  --include  --header "Content-Type:application/json"  --request "POST"  --data '{"username":"yaniv","password":"yaniv123",email:"yaniv@gmail.com"}'
+
+
+curl http://localhost:6969/signup  --include  --header "Content-Type:application/json"  --request "POST"  --data '{"username":"yaniv","password":"yaniv123",email:"yaniv@gmail.com"}'
+
+curl -X POST http://localhost:6969/upload -F "upload=@images.jpeg -F data="{\"username\":\"yaniv\",\"password\":\"yaniv123\",email:\"yaniv@gmail.com\"}"

@@ -51,24 +51,8 @@ const (
 var state bool = false
 
 func CreateDirIfNeeded(DirName string) error {
-	fi, err := os.Stat(LogDir)
-	if err != nil { // if the folder doesnt exists we will create one
-		err = os.Mkdir(LogDir, 0755)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	if !fi.IsDir() { // if found file but isnt a folder we will create one.
-		err = os.Mkdir(LogDir, 0755)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	return nil
+	err := os.MkdirAll(DirName, 0777)
+	return err
 }
 
 func CreateLogger(name string, fname string) *Logger {

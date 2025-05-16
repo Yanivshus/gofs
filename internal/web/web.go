@@ -2,6 +2,8 @@ package web
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/Yanivshus/gofs/internal/database"
 	"github.com/Yanivshus/gofs/internal/files"
 
@@ -17,6 +19,16 @@ func Init_web() {
 	getfiles_logger = files.CreateLogger("GET_FILES", "file.log")
 	go chdir_logger.KeepLogger()
 	go getfiles_logger.KeepLogger()
+
+	err := files.CreateDirIfNeeded("assets")
+	if err != nil {
+		panic(err)
+	}
+
+	err = files.CreateDirIfNeeded("fs")
+	if err != nil {
+		panic(err)
+	}
 }
 
 func Dtor_web() {
@@ -92,4 +104,19 @@ func HandleSignUp(c *gin.Context) {
 		return
 	}
 
+}
+
+func HandleUpload(c *gin.Context) {
+	file, err := c.FormFile("upload")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = c.SaveUploadedFile(file, where to save+file.Filename)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
+	}
+
+	
 }

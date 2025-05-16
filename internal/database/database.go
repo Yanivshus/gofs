@@ -4,11 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"os"
-	"strings"
-
 	"github.com/Yanivshus/gofs/internal/crypto"
 	"github.com/Yanivshus/gofs/internal/files"
+	"os"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -190,7 +189,7 @@ func (db *DbInstance) AddUserToPending(usr User) error {
 	defer tx.Commit() // commit the transaction at end of life of tx.
 
 	var sb strings.Builder
-	sb.WriteString("INSERT INTO Pending (Username, Password, Email, Salt) VALUES ($1,$2,$3,$4)")
+	sb.WriteString("INSERT INTO Pending (Username, Password, Email, Salt) VALUES ($1,$2,$3,$4);")
 	stmt, err := tx.Prepare(sb.String())
 	if err != nil {
 		return err
