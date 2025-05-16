@@ -1,7 +1,10 @@
 package web
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/Yanivshus/gofs/internal/database"
@@ -86,37 +89,44 @@ func HandleLogin(c *gin.Context) {
 
 // TODO : dont allow to see api gateway responses.
 func HandleSignUp(c *gin.Context) {
-	var user database.User
-	if err := c.BindJSON(&user); err != nil {
-		c.IndentedJSON(500, gin.H{"error": "internal error1"})
+	file, _, err := c.Request.FormFile("upload")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	defer file.Close()
 
-	db := database.GetInstanceDb()
+	// copy file bytes to buffer , later will be saved as blob.
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, file); err != nil {
+		c.IndentedJSON(500, gin.H{"error": "internal error1"})
+
+	}
+
+	userData := c.Request.FormValue("data")
+	var user database.User
+	fmt.Println(userData)
+	fmt.Println(userData)
+	err = json.Unmarshal([]byte(userData), &user)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.IndentedJSON(500, gin.H{"error": "json conversion err"}) // for now
+		return
+	}
+	fmt.Println(buf.Bytes())
+	fmt.Println(user)
+
+	/*db := database.GetInstanceDb()
 	if res, err := db.DoesUserExists(user, "pending"); err != nil || res {
 		c.IndentedJSON(500, gin.H{"error": "user already exists"})
 		return
 	}
 
-	err := db.AddUserToPending(user)
+	err = db.AddUserToPending(user)
 	if err != nil {
 		c.IndentedJSON(500, gin.H{"error": "problem inserting user to pending"})
 		return
-	}
+	}*/
 
 }
 
-func HandleUpload(c *gin.Context) {
-	file, err := c.FormFile("upload")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	err = c.SaveUploadedFile(file, where to save+file.Filename)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
-	}
-
-	
-}

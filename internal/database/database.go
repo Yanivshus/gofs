@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/Yanivshus/gofs/internal/crypto"
-	"github.com/Yanivshus/gofs/internal/files"
 	"os"
 	"strings"
+
+	"github.com/Yanivshus/gofs/internal/crypto"
+	"github.com/Yanivshus/gofs/internal/files"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -75,11 +76,6 @@ func GetInstanceDb() DbInstance {
 }
 
 func connectPostgres() (*sqlx.DB, *files.Logger) {
-	/*err := godotenv.Load(".env")
-	if err != nil {
-		panic(err)
-	}*/
-
 	password := os.Getenv("DB_PASS")
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+

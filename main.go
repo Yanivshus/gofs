@@ -29,7 +29,6 @@ func main() {
 	router.POST("/chdir", web.HandleChdir)
 	router.GET("/files", web.HandleGetFiles)
 	router.POST("/signup", web.HandleSignUp)
-	router.POST("/upload", web.HandleUpload)
 	router.Run("localhost:6969")
 	web.Dtor_web()
 }
