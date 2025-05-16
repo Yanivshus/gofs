@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/Yanivshus/gofs/internal/crypto"
-	"github.com/Yanivshus/gofs/internal/files"
 	"os"
 	"strings"
+
+	"github.com/Yanivshus/gofs/internal/crypto"
+	"github.com/Yanivshus/gofs/internal/files"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -64,6 +65,7 @@ func InitDb() {
 	gdb.ex = false
 }
 
+// works like a singleton.
 func GetInstanceDb() DbInstance {
 	if !gdb.ex {
 		gdb.Db, gdb.Lg = connectPostgres()

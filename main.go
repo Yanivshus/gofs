@@ -12,7 +12,8 @@ import (
 
 func main() {
 	web.Init_web()
-	database.InitDb()
+	database.LoadEnv() // load env veriables ment for db
+	database.InitDb() // init instance
 	database.GetInstanceDb()
 
 	err := os.Chdir("fs") // change to the directory
