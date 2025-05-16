@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fs/gofs_file_server/internal/database"
-	"fs/gofs_file_server/internal/files"
-	"fs/gofs_file_server/internal/web"
 	"os"
+
+	"github.com/Yanivshus/gofs/internal/database"
+	"github.com/Yanivshus/gofs/internal/files"
+	"github.com/Yanivshus/gofs/internal/web"
 
 	"github.com/gin-gonic/gin"
 )

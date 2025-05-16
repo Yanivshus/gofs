@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"fs/gofs_file_server/internal/crypto"
-	"fs/gofs_file_server/internal/files"
+	"github.com/Yanivshus/gofs/internal/crypto"
+	"github.com/Yanivshus/gofs/internal/files"
 	"os"
 	"strings"
 

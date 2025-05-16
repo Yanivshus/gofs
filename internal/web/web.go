@@ -2,8 +2,8 @@ package web
 
 import (
 	"encoding/json"
-	"fs/gofs_file_server/internal/database"
-	"fs/gofs_file_server/internal/files"
+	"github.com/Yanivshus/gofs/internal/database"
+	"github.com/Yanivshus/gofs/internal/files"
 
 	"github.com/gin-gonic/gin"
 )
