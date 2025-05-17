@@ -3,10 +3,9 @@ package web
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
-
+	b64 "encoding/base64"
 	"github.com/Yanivshus/gofs/internal/database"
 	"github.com/Yanivshus/gofs/internal/files"
 
@@ -105,28 +104,29 @@ func HandleSignUp(c *gin.Context) {
 
 	userData := c.Request.FormValue("data")
 	var user database.User
-	fmt.Println(userData)
-	fmt.Println(userData)
 	err = json.Unmarshal([]byte(userData), &user)
 	if err != nil {
-		fmt.Println(err.Error())
 		c.IndentedJSON(500, gin.H{"error": "json conversion err"}) // for now
 		return
 	}
-	fmt.Println(buf.Bytes())
-	fmt.Println(user)
 
-	/*db := database.GetInstanceDb()
+	db := database.GetInstanceDb()
 	if res, err := db.DoesUserExists(user, "pending"); err != nil || res {
-		c.IndentedJSON(500, gin.H{"error": "user already exists"})
+		c.IndentedJSON(500, gin.H{"error": "user waiting for admin approval"})
 		return
+	}
+
+	stringPhoto := b64.StdEncoding.EncodeToString(buf.Bytes())
+	err = db.InsertImageByUsername(stringPhoto, user.Username)
+	if err != nil {
+		c.IndentedJSON(500, gin.H{"error": "rpoblem inserting image"})
+		
 	}
 
 	err = db.AddUserToPending(user)
 	if err != nil {
 		c.IndentedJSON(500, gin.H{"error": "problem inserting user to pending"})
 		return
-	}*/
+	}
 
 }
-

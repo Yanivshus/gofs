@@ -45,7 +45,7 @@ const (
 const tables = `
 CREATE TABLE IF NOT EXISTS Users 
 (ID SERIAL PRIMARY KEY,
-Username TEXT NOT NULL,
+Username TEXT NOT NULL UNIQUE,
 Password BYTEA NOT NULL,
 Email TEXT NOT NULL,
 Salt TEXT NOT NULL);
@@ -53,10 +53,18 @@ Salt TEXT NOT NULL);
 
 CREATE TABLE IF NOT EXISTS Pending 
 (ID SERIAL PRIMARY KEY,
-Username TEXT NOT NULL,
+Username TEXT NOT NULL UNIQUE,
 Password BYTEA NOT NULL,
 Email TEXT NOT NULL,
 Salt TEXT NOT NULL);
+
+CREATE TABLE IF NOT EXISTS Images
+(ID SERIAL PRIMARY KEY,
+B64Image TEXT NOT NULL,
+Username TEXT NOT NULL, 
+CONSTRAINT fk_Username FOREIGN KEY (Username)
+REFERENCES Users(Username));
+
 `
 
 var gdb DbInstance
@@ -198,6 +206,7 @@ func (db *DbInstance) AddUserToPending(usr User) error {
 
 	res, err := stmt.Exec(usr.Username, crypto.HashArgon(usr.Password, salt), usr.Email, salt)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
@@ -208,6 +217,38 @@ func (db *DbInstance) AddUserToPending(usr User) error {
 	var log strings.Builder
 	log.WriteString("Added user to pending, username: ")
 	log.WriteString(usr.Username)
+	db.Lg.LogDb(log.String())
+
+	return nil
+}
+
+func (db *DbInstance) InsertImageByUsername(b64Image string, username string) error {
+	tx, err := db.Db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Commit() // commit the transaction at end of life of tx.
+
+	var sb strings.Builder
+	sb.WriteString("INSERT INTO Images (B64Image, Username) VALUES ($1,$2);")
+	stmt, err := tx.Prepare(sb.String())
+	if err != nil {
+		return err
+	}
+
+	res, err := stmt.Exec()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if n, _ := res.RowsAffected(); n == 0 {
+		return errors.New("problem inserting pending user")
+	}
+
+	var log strings.Builder
+	log.WriteString("Added id photo to images, username: ")
+	log.WriteString(username)
 	db.Lg.LogDb(log.String())
 
 	return nil
