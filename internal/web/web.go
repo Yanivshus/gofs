@@ -2,10 +2,11 @@ package web
 
 import (
 	"bytes"
+	b64 "encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
-	b64 "encoding/base64"
+
 	"github.com/Yanivshus/gofs/internal/database"
 	"github.com/Yanivshus/gofs/internal/files"
 
@@ -98,10 +99,11 @@ func HandleSignUp(c *gin.Context) {
 	// copy file bytes to buffer , later will be saved as blob.
 	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, file); err != nil {
-		c.IndentedJSON(500, gin.H{"error": "internal error1"})
-
+		c.IndentedJSON(500, gin.H{"error": "internal error"})
+		return
 	}
 
+	// extract user adta from form.
 	userData := c.Request.FormValue("data")
 	var user database.User
 	err = json.Unmarshal([]byte(userData), &user)
@@ -117,13 +119,7 @@ func HandleSignUp(c *gin.Context) {
 	}
 
 	stringPhoto := b64.StdEncoding.EncodeToString(buf.Bytes())
-	err = db.InsertImageByUsername(stringPhoto, user.Username)
-	if err != nil {
-		c.IndentedJSON(500, gin.H{"error": "rpoblem inserting image"})
-		
-	}
-
-	err = db.AddUserToPending(user)
+	err = db.AddUserToPending(user, stringPhoto)
 	if err != nil {
 		c.IndentedJSON(500, gin.H{"error": "problem inserting user to pending"})
 		return
